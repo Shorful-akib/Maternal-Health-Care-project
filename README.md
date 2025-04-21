@@ -2,7 +2,9 @@
 Exploring urban-rural inequalities of maternal healthcare utilization in Bangladesh.
 <br> 
 Published in Heliyon- https://doi.org/10.1016/j.heliyon.2025.e41945
+<br>
 **Abstract**
+
 Background:
 Bangladesh has made significant progress across various sectors, including healthcare. However, noticeable disparities persist in the healthcare sector, particularly in maternal healthcare between urban and rural areas. Despite substantial advancements in maternal healthcare services (MHCS), such as Antenatal care (ANC), Facility-Based Delivery (FBD), and Skilled Birth Attendants (SBA), utilization depends on various socioeconomic factors. This study aims to assess the impact of different factors and describe the urban-rural inequalities in maternal healthcare service utilization.
 Methods & study design:
