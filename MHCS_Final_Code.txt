@@ -1,0 +1,1090 @@
+
+
+
+******************************************************************************** 
+*2019
+********************************************************************************
+
+clear
+set maxvar 10000
+*directory
+cd "D:\Works\MHCS\data"
+use "BDIR7RFL" , clear
+
+********************************************************************************
+*WEIGHT, STRATA, CLUSTER VARIABLE FOR THE APPENDED DATA
+********************************************************************************
+gen wgt=v005/1000000
+svyset [pw=wgt],psu(v001) strata(v022)
+
+********************************************************************************
+*Creating Variables
+********************************************************************************
+
+*Assistance
+
+*doctor
+svy: tab m3a_1
+gen doctor=m3a_1
+recode  doctor   0=0  
+recode  doctor   1=1
+tab doctor
+
+*Nurse
+
+svy: tab m3b_1
+gen nurse=m3b_1
+recode  nurse   0 = 0  
+recode  nurse   1 = 1 
+tab nurse
+
+*family welfare visitor
+
+svy: tab m3c_1
+gen fwv=m3c_1
+recode  fwv   0 = 0  
+recode  fwv   1 = 1 
+tab fwv
+
+*Community Skilled birth attendance
+
+svy: tab m3d_1
+gen csba=m3d_1
+recode  csba   0 = 0  
+recode  csba   1 = 1 
+tab csba
+
+
+
+*Sub-Assistant community medical officer
+svy: tab m3f_1
+gen scmo=m3f_1
+recode  scmo   0 = 0  
+recode  scmo   1 = 1 
+tab scmo
+ 
+
+**In page 120(164 in pdf) the skilled assistant is given.
+
+
+
+
+*************
+*Assistance
+*************
+
+gen assist = m3a_1+m3b_1+m3c_1+m3d_1+m3f_1
+recode assist 0=0 
+recode assist 1/3=1 
+label define assist 0 "Not Skilled" 1 "Skilled"
+label values assist assist
+svy: tab assist
+
+
+   
+
+*********************
+*Antinatal Care
+*********************
+
+svy: tab m14_1
+gen anc=m14_1
+recode anc 0/3=0
+recode anc 4/20=1
+recode anc 98=.
+label define anc 0 "less4" 1 "4above"
+label values anc anc
+svy: tab anc
+****************************
+*Place of delivery
+****************************
+*Checking the variable label
+label list `: value label m15_1'
+
+svy: tab m15_1
+gen pod=m15_1
+recode pod 10/11=0
+recode pod 20/42=1
+recode pod 96=0
+label define pod  1 "Health facility" 0 "No health facility"
+label values pod pod
+svy: tab pod
+
+****************************
+*Place of rasidence
+*********** *****************
+label list `: value label v025'
+
+svy: tab v025
+gen area1=v025
+recode area1 1=1
+recode area1 2=0
+label define area1  0 "Rural" 1 "Urban"
+label values area area1
+svy: tab area
+
+
+
+
+********************************************************************************
+*Checking information with report(table:1)
+********************************************************************************
+
+*Mother Age.
+
+label list `: value label v013'
+
+svy: tab v013
+gen mage=v013
+recode mage 1=1
+recode mage 2=2
+recode mage 3/7=3
+label define mage 1 "15-19" 2 "20-24" 3 "25+"
+label values mage mage
+svy: tab mage
+tab mage area, col
+svy: tab mage area, col
+
+
+
+********
+*"Number children ever born" was not found
+********
+
+
+svy: tab v201
+gen numch=v201
+recode numch 0/2=0
+recode numch 3/13=1
+label define numch 0 " Less than 2" 1 "More than 2"
+label values numch numch
+svy: tab numch
+tab numch area, col
+svy: tab numch area, col  
+ 
+*************************************************************
+*Wanted Pregnancy
+*************************************************************
+svy: tab m10_1
+gen wp=m10_1
+recode wp 1=1
+recode wp 2=2
+recode wp 3=3
+label define wp 3 "no more" 2 "later" 1 "then"
+label values wp wp
+tab wp
+svy: tab wp
+tab wp area, col
+svy: tab wp area, col
+
+
+************************************************************
+*Method Currently used
+************************************************************
+svy: tab v307_01
+gen mcu=v307_01
+recode mcu 0=0
+recode mcu 1=1
+label define mcu  0 "no" 1 "yes"
+label values mcu mcu
+tab mcu
+svy: tab mcu
+tab mcu area, col
+svy: tab mcu area, col
+
+**********************************
+*birth order
+**********************************
+svy: tab bord_01
+gen birthord=bord_01
+svy: tab birthord
+recode birthord 1=1
+recode birthord 2=2
+recode birthord 3=3
+recode birthord 4/13=4
+label define birthord1 1 "First" 2 "Second" 3 "Third" 4 "Four+"
+label values birthord birthord
+tab birthord
+svy: tab birthord
+tab birthord area, col
+svy: tab birthord area, col
+
+**************************************
+*"Length of preceding birth" 
+**************************************
+
+svy: tab b11_01
+gen lpb=b11_01
+recode lpb 1/23=1
+recode lpb 24/59=2
+recode lpb 60/291=3
+label define lpb 1 "< 24 months" 2 "24-59 months" 3 "60+ months"
+label values lpb lpb
+tab lpb
+svy: tab lpb
+tab lpb area, col
+svy: tab lpb area, col
+**************************************
+*Religion.
+**************************************
+svy: tab v130
+gen religion=v130
+recode religion 1=1
+recode religion 2/4=0
+label define religion 1 "Islam" 0 "Others"
+label values religion religion
+tab religion
+svy: tab religion
+tab religion area, col
+svy: tab religion area, col
+
+***************************************
+*Marital Status
+*************************************
+*levelsof v501
+*label list `: value label v501'
+
+*svy: tab v501
+*gen mstatus=v501
+*recode mstatus 1=1
+*recode mstatus 3/5=0
+*recode mstatus 0=0
+*label define mstatus 1 "married" 0 "no longer living togather/separated"
+*label values mstatus mstatus
+*tab mstatus
+*svy: tab mstatus
+*tab mstatus area, col
+*svy: tab mstatus area, col
+
+***************************************
+*Marital or cohabitation duration
+***************************************
+label list `: value label v5z'
+
+svy: tab v513
+gen mcoh=v513
+recode mcoh 1=1
+recode mcoh 2=2
+recode mcoh 3=3
+recode mcoh 4=4
+recode mcoh 5=5
+recode mcoh 6=6
+recode mcoh 7=7
+label define mcoh 1 "0-4" 2 "5-9" 3 "10-14" 4 "15-19" 5 "20-24" 6 "25-29" 7 "30+"
+label values mcoh mcoh
+tab mcoh
+svy: tab mcoh
+tab mcoh area, col
+svy: tab mcoh area, col
+
+**********************************************
+*household head sex.
+**********************************************
+gen hhsex = v151
+svy: tab hhsex
+
+recode hhsex 1=1
+recode hhsex 2=0
+
+label define hhsex 1 "Male" 0 "Female"
+label values hhsex hhsex
+tab hhsex 
+svy: tab hhsex
+tab hhsex area, col
+svy: tab hhsex area, col
+
+**********************************************
+*household head age.(household file need to merge)
+**********************************************
+gen hhage = v152
+svy: tab hhage
+recode hhage 15/24=1
+recode hhage 25/29=2
+recode hhage 30/34=3
+recode hhage 35/95=4
+label define hhage 1 "15-24" 2 "25-29" 3 "30-34" 4 "35+"
+label values hhage hhage
+tab hhage 
+svy: tab hhage 
+tab hhage area, col
+svy: tab hhage area, col
+
+********************
+*Partner's education level
+********************
+label list `: value label v701'
+svy: tab v701
+gen pelevel = v701
+recode pelevel 8=4
+label define pelevel  0 "No education" 1 "Primary" 2 "Secondary" 3 "Higher" 4 "don't know"
+label values pelevel pelevel
+svy: tab pelevel
+tab pelevel 
+svy: tab pelevel 
+tab pelevel area, col
+svy: tab pelevel area, col
+
+
+*****************************
+*Type of toilet facility
+*****************************
+label list `: value label v116'
+
+svy: tab v116
+gen tf=v116
+recode tf 10/22=1
+recode tf 23/31=0
+recode tf 41=1
+recode tf 42/97=0
+recode tf 99=.
+label define tf 1 "Improved" 0 "Unimproved"
+label values tf tf
+tab tf
+svy: tab tf
+tab tf area, col
+svy: tab tf area, col
+
+
+*****************************
+**The primary Source of drinking water 
+*****************************
+label list `: value label v113'
+
+gen sdwater = v113
+svy: tab sdwater
+recode sdwater 11/14 = 1
+recode sdwater 21/31 = 1
+recode sdwater 32 = 0
+recode sdwater 41 = 1
+recode sdwater 42/43 = 0
+recode sdwater 51/71 = 1
+recode sdwater 97 = 0
+label define sdwater 1 "Improved" 0 "Unimproved"
+label values sdwater sdwater
+tab sdwater area, col
+svy: tab sdwater area, col
+
+***********************
+*Mother Education.
+************************
+svy: tab v106
+gen melevel = v106
+label define melevel  0 "No education" 1 "Primary" 2 "Secondary" 3 "Higher"
+label values melevel melevel
+svy: tab melevel
+tab melevel 
+tab melevel area, col
+svy: tab melevel area, col
+
+************************
+*currently working 
+************************
+svy: tab v714
+gen cworking = v714
+label define cworking 0 "No" 1 "Yes"
+label values cworking cworking
+tab cworking
+svy: tab cworking
+
+*************************
+*Household Wealth index
+*************************
+gen wind= v190
+svy: tab wind
+label define wind 1 "Poorest" 2 "Poorer" 3 "Middle" 4 "Richer" 5 "Richest"
+label values wind wind
+tab wind 
+svy: tab wind 
+tab wind area, col
+svy: tab wind area, col
+
+************************
+*Media (I found two variables regarding to newspaper v157 & v384c)
+************************
+
+*media
+svy: tab v121
+gen tv=v121
+svy: tab tv
+recode tv 0=0
+recode tv 1=1
+recode tv 7=0
+tab tv 
+svy: tab 
+
+svy: tab v120
+gen radio=v120
+svy: tab radio
+recode radio 0=0
+recode radio 1=1
+recode radio 7=0
+tab radio 
+svy: tab radio 
+
+svy: tab v384c
+gen newspaper=v384c
+svy: tab newspaper
+recode newspaper 0=0
+recode newspaper 1=1
+tab newspaper 
+svy: tab newspaper 
+
+
+gen media = tv + radio + newspaper
+tab media
+recode media 0=0
+recode media 1/3=1
+label define media 0 "No" 1 "Yes"
+label values media media
+tab media area
+svy: tab media area
+
+*****************************************
+final say on woman's health care 
+*****************************************
+svy: tab v743a
+gen decision=v743a
+recode decision 1=1
+recode decision 2=2
+recode decision 4=4
+recode decision 5/6=5
+label define decision 1 "Women alone" 2 "Woman and husband/partner" 4 "Husband/partner" 5 "Someone"
+label values decision decision
+tab decision area
+svy: tab decision area
+
+
+***************
+***************
+Other variable which is not in the paper
+***************
+***************
+
+*Division. 
+svy: tab v024
+gen division=v024
+label define division  1 "Barisal" 2 "Chittagong" 3 "Dhaka" 4 "Khulna" 5 "Mymensingh" 6 "Rajshahi" 7 "Rangpur" 8 "Sylhet"
+label values division division
+tab division
+tab division area, col
+svy: tab division area, col
+
+*HH Occu.
+svy: tab v704
+
+label list `: value label v704'
+
+gen hhocu = v704
+recode hhocu 12/15=1
+recode hhocu 16/31=2
+recode hhocu 41/52=3
+recode hhocu 11=4
+recode hhocu 61/96=4
+recode hhocu 0=4
+recode hhocu 99998=.
+label define hhocu  1 "Farming/Agriculture" 2 "Worker" 3 "Jobholder" 4 "Others"
+label values hhocu hhocu
+svy: tab hhocu
+tab hhocu area, col
+svy: tab hhocu area, col
+
+*******************
+*HH family members. (median has been taken )
+*******************
+
+gen hhmembers = v136
+svy: tab hhmembers
+summariz hhmembers, detail
+replace  hhmembers    = 0 if (hhmembers <= 5) 
+replace  hhmembers   = 1 if (hhmembers > 5)
+label define hhmembers 0 "less equal 5" 1 "greater 5"
+label values hhmembers hhmembers
+tab hhmembers area, row
+svy: tab hhmembers area, row
+
+****************************
+*partners scholling type
+****************************
+
+svy: tab s903a
+gen pschtype=s903a
+svy: tab pschtype
+
+recode pschtype 1=1
+recode pschtype 2=0
+
+label define pschtype 1 "School" 0 "Madrasha"
+label values pschtype pschtype
+tab pschtype area, row
+svy: tab pschtype area, row
+
+***************************************
+*Continue studies or work after marrage(s711d & s711f)
+***************************************
+*continue studies
+
+gen constu = s711d
+svy: tab constu
+recode  constu 0= 0 
+recode  constu 1/4= 1
+label define constu 0 "No" 1 "yes"
+label values constu constu
+tab constu area, row
+svy: tab constu area, row
+
+
+********************************************************************************
+*Checking information with report(table:2 Assistance)
+********************************************************************************
+
+******************
+*Mother Age.
+******************
+
+tabulate mage area if anc==1, chi column
+tabulate mage area if pod==1, chi column
+tabulate mage area if assist==1, chi column
+
+
+
+*************************************************
+*"Number children ever born" was not found
+*************************************************
+tabulate numch area if anc==1, chi column
+tabulate numch area if pod==1, chi column
+tabulate numch area if assist==1, chi column
+
+*************************************************************
+*Wanted Pregnancy
+*************************************************************
+
+
+tabulate wp area if anc==1, chi column
+tabulate wp area if pod==1, chi column
+tabulate wp area if assist==1, chi column
+************************************************************
+*Method Currently used
+************************************************************
+
+tabulate mcu area if anc==1, chi column
+tabulate mcu area if pod==1, chi column
+tabulate mcu area if assist==1, chi column
+**********************************
+*birth order
+**********************************
+
+tabulate birthord area if anc==1, chi column
+tabulate birthord area if pod==1, chi column
+tabulate birthord area if assist==1, chi column
+
+***********************************
+*Length of preceding Birth
+***********************************
+
+tabulate lpb area if anc==1, chi column
+tabulate lpb area if pod==1, chi column
+tabulate lpb area if assist==1, chi column
+
+
+**************************************
+*Religion.
+**************************************
+
+tabulate religion area if anc==1, chi column
+tabulate religion area if pod==1, chi column
+tabulate religion area if assist==1, chi column
+
+***************************************
+*Marital Status (problem widowed is missing)
+***************************************
+
+*tabulate mstatus area if anc==1, chi column
+*tabulate mstatus area if pod==1, chi column
+*tabulate mstatus area if assist==1, chi column
+
+***************************************
+*Marital or cohabitation duration
+***************************************
+
+tabulate mcoh area if anc==1, chi column
+tabulate mcoh area if pod==1, chi column
+tabulate mcoh area if assist==1, chi column
+
+**********************************************
+*household head sex.
+**********************************************
+
+tabulate hhsex area if anc==1, chi column
+tabulate hhsex area if pod==1, chi column
+tabulate hhsex area if assist==1, chi column
+
+**********************************************
+*household head age.
+**********************************************
+
+tabulate hhage area if anc==1, chi column
+tabulate hhage area if pod==1, chi column
+tabulate hhage area if assist==1, chi column
+
+********************
+*Partner's education level
+********************
+
+tabulate pelevel area if anc==1, chi column
+tabulate pelevel area if pod==1, chi column
+tabulate pelevel area if assist==1, chi column
+
+**********************
+*No observation found in 'Number of other wives'
+***********************
+
+
+*****************************
+*Type of toilet facility
+*****************************
+
+tabulate tf area if anc==1, chi column
+tabulate tf area if pod==1, chi column
+tabulate tf area if assist==1, chi column
+
+*****************************
+**The primary Source of drinking water 
+*****************************
+
+tabulate sdwater area if anc==1, chi column
+tabulate sdwater area if pod==1, chi column
+tabulate sdwater area if assist==1, chi column
+
+***********************
+*Mother Education.
+************************
+
+tabulate melevel area if anc==1, chi column
+tabulate melevel area if pod==1, chi column
+tabulate melevel area if assist==1, chi column
+
+************************
+*currently working 
+************************
+
+tabulate cworking area if anc==1, chi column
+tabulate cworking area if pod==1, chi column
+tabulate cworking area if assist==1, chi column
+
+*************************
+*Household Wealth index
+*************************
+
+tabulate wind area if anc==1, chi column
+tabulate wind area if pod==1, chi column
+tabulate wind area if assist==1, chi column
+
+************************
+*Media (newspaper need to be added)
+************************
+
+tabulate media area if anc==1, chi column
+tabulate media area if pod==1, chi column
+tabulate media area if assist==1, chi column
+
+**********************************
+*Final Say on Women's health Care
+**********************************
+tabulate decision area if anc==1, chi column
+tabulate decision area if pod==1, chi column
+tabulate decision area if assist==1, chi column
+
+
+
+*******************************************************************************************************
+
+
+***************
+***************
+Other variable which is not in the paper
+***************
+***************
+
+
+************************
+*Division
+************************
+
+tabulate division area if anc==1, chi column
+tabulate division area if pod==1, chi column
+tabulate division area if assist==1, chi column
+
+****************
+*Household Head Occupation
+*****************
+
+tabulate hhocu area if anc==1, chi column
+tabulate hhocu area if pod==1, chi column
+tabulate hhocu area if assist==1, chi column
+
+***************************
+*HH family members. 
+***************************
+
+tabulate hhmembers area if anc==1, chi column
+tabulate hhmembers area if pod==1, chi column
+tabulate hhmembers area if assist==1, chi column
+
+***************************
+*partners scholling type
+***************************
+
+tabulate pschtype area if anc==1, chi column
+tabulate pschtype area if pod==1, chi column
+tabulate pschtype area if assist==1, chi column
+
+****************************
+*continue study/work after marriage
+****************************
+*study
+tabulate constu area if anc==1, chi column
+tabulate constu area if pod==1, chi column
+tabulate constu area if assist==1, chi column
+
+
+****************************************************
+***Crude logistic regrssion
+******************************************************
+* area is newly added to the version 3
+*******************
+*anc
+******************
+svy: logit anc i.area, or
+*area is newly added
+svy: logit anc i.mage, or
+svy: logit anc i.numch, or
+svy: logit anc i.wp, or
+svy: logit anc i.mcu, or
+svy: logit anc i.birthord, or
+svy: logit anc i.lpb, or
+svy: logit anc i.religion, or
+*svy: logit anc i.mstatus, or
+svy: logit anc i.mcoh, or
+svy: logit anc i.hhsex, or
+svy: logit anc i.hhage, or
+svy: logit anc i.pelevel, or
+svy: logit anc i.tf, or
+svy: logit anc i.sdwater, or
+svy: logit anc i.melevel, or
+svy: logit anc i.cworking, or
+svy: logit anc i.wind, or
+svy: logit anc i.media, or
+svy: logit anc i.decision, or
+svy: logit anc i.division, or
+svy: logit anc i.hhocu, or
+svy: logit anc i.hhmembers, or
+svy: logit anc i.pschtype, or
+svy: logit anc i.constu, or
+
+*****************
+*Pod
+*****************
+svy: logit pod i.area, or
+svy: logit pod i.mage, or
+svy: logit pod i.numch, or
+svy: logit pod i.wp, or
+svy: logit pod i.mcu, or
+svy: logit pod i.birthord, or
+svy: logit pod i.lpb, or
+svy: logit pod i.religion, or
+*svy: logit pod i.mstatus, or
+svy: logit pod i.mcoh, or
+svy: logit pod i.hhsex, or
+svy: logit pod i.hhage, or
+svy: logit pod i.pelevel, or
+svy: logit pod i.tf, or
+svy: logit pod i.sdwater, or
+svy: logit pod i.melevel, or
+svy: logit pod i.cworking, or
+svy: logit pod i.wind, or
+svy: logit pod i.media, or
+svy: logit pod i.decision, or
+svy: logit pod i.division, or
+svy: logit pod i.hhocu, or
+svy: logit pod i.hhmembers, or
+svy: logit pod i.pschtype, or
+svy: logit pod i.constu, or
+
+
+***************
+*Assistance
+***************
+
+svy: logit assist i.area, or
+
+svy: logit assist i.mage, or
+svy: logit assist i.numch, or
+svy: logit assist i.wp, or
+svy: logit assist i.mcu, or
+svy: logit assist i.birthord, or
+svy: logit assist i.lpb, or
+svy: logit assist i.religion, or
+svy: logit assist i.mstatus, or
+svy: logit assist i.mcoh, or
+svy: logit assist i.hhsex, or
+svy: logit assist i.hhage, or
+svy: logit assist i.pelevel, or
+svy: logit assist i.tf, or
+svy: logit assist i.sdwater, or
+svy: logit assist i.melevel, or
+svy: logit assist i.cworking, or
+svy: logit assist i.wind, or
+svy: logit assist i.media, or
+svy: logit assist i.decision, or
+svy: logit assist i.division, or
+svy: logit assist i.hhocu, or
+svy: logit assist i.hhmembers, or
+svy: logit assist i.pschtype, or
+svy: logit assist i.constu, or
+
+
+***********************************
+Multinomial Logistic Regression
+***********************************
+
+svy: logit anc i.area i.numch i.wp i.religion i.hhage i.pelevel i.melevel i.wind i.media i.division i.hhocu, or
+
+svy: logit pod i.area i.mage i.numch i.wp i.mcu  i.religion  i.hhage i.pelevel i.melevel i.cworking i.wind i.media i.division i.hhocu, or
+
+svy: logit assist i.area i.mage i.numch i.wp i.mcu i.religion i.hhage i.pelevel i.melevel i.cworking i.wind i.media i.division i.hhocu, or
+
+
+
+
+
+************************************
+*Decomposition
+************************************
+
+
+******************************
+*Blinder-Oaxaca Decomposition 
+******************************
+
+******************************************
+*creating dummy variabless
+******************************************
+
+tabulate mage, generate(mage)
+tabulate numch,generate(numch)
+tabulate wp,generate(wp)
+tabulate mcu, generate(mcu)
+tabulate birthord,generate(birthord)
+tabulate lpb,generate(lpb)
+tabulate religion, generate(religion)
+*tabulate mstatus,generate(mstatus)
+tabulate mcoh,generate(mcoh)
+tabulate hhsex, generate(hhsex)
+tabulate hhage,generate(hhage)
+tabulate pelevel,generate(pelevel)
+tabulate sdwater,generate(sdwater)
+tabulate melevel,generate(melevel)
+tabulate cworking, generate(cworking)
+tabulate wind,generate(wind)
+tabulate media,generate(media)
+tabulate decision,generate(decision)
+tabulate division,generate(division)
+tabulate hhmembers,generate(hhmembers)
+tabulate pschtype,generate(pschtype)
+tabulate constu,generate(constu)
+
+
+
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%Corrected Concentration Index
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+***code start here
+
+*******************
+******anc
+*******************
+
+
+***CONCENTRATION INDEX - CORRECTED VERSION
+
+egen raw_rank=rank(wind), unique
+sort raw_rank
+quietly summ wgt
+gen wi=wgt/r(sum)
+gen cumsum=sum(wi)
+gen wj=cumsum[_n-1]
+replace wj=0 if wj==.
+gen rank=wj+0.5*wi
+drop raw_rank wi cumsum wj
+
+qui sum anc [aw=wgt]
+scalar mean=r(mean)
+cor anc rank [aw=wgt], covariance
+sca CI=8*r(cov_12)
+display "concentration index by convenient covariance method", CI
+
+***Computing the semi-elasticities, CI and contributions of each factor
+clear matrix
+#Creating dummy variable
+
+*global X "mage1 mage2 mage3 numch1 numch2 wp1 wp2 wp3 birthord1 birthord2 birthord3 birthord4 lpb1 lpb2 lpb3 mcoh1 mcoh2 mcoh3 mcoh4 mcoh5 mcoh6 mcoh7 hhage1 hhage2 hhage3 hhage4 pelevel1 pelevel2 pelevel3 pelevel4 pelevel5 wind1 wind2 wind3 wind4 wind5 decision1 decision2 decision3 decision4"
+*global X "mage numch wp birthord lpb mcoh hhage pelevel wind"
+
+*global X "mage numch wp mcu religion hhage pelevel melevel cworking wind media division hhocu"
+
+global X "mage1 mage2 mage3 numch1 numch2 wp1 wp2 wp3 birthord1 birthord2 birthord3 birthord4 lpb1 lpb2 lpb3 mcoh1 mcoh2 mcoh3 mcoh4 mcoh5 mcoh6 mcoh7 hhage1 hhage2 hhage3 hhage4 pelevel1 pelevel2 pelevel3 pelevel4 pelevel5 wind1 wind2 wind3 wind4 wind5 decision1 decision2 decision3 decision4"
+
+regress anc $X [pw=wgt], robust cluster(v001)
+
+*******decomposition starts here
+foreach x of global X {
+qui {
+scal b_`x'=_b[`x']
+corr rank `x' [aw=wgt], c
+sca cov_`x'=r(cov_12)
+sum `x' [aw=wgt]
+sca elas_`x'=(b_`x'*r(mean))
+sca CI_`x'=8*cov_`x'
+sca con_`x'=4*(elas_`x'*CI_`x')
+sca prcnt_`x'=(con_`x'/CI)*100
+
+
+}
+
+di "`x' elasticity:", elas_`x'
+di "`x' concentration index:", CI_`x'
+di "`x' contribution:", con_`x'
+di "`x' percentage contribution:", prcnt_`x'
+
+#matrix new = J(100,4,0)\(elas_`x', CI_`x', con_`x', prcnt_`x')
+matrix new = nullmat(new)\(elas_`x', CI_`x', con_`x', prcnt_`x')
+
+}
+matrix rownames new= $X
+matrix colnames new = "Elasticity""CI""Absolute""%"
+matrix list new, format(%8.4f)
+*********
+
+**************
+*pod
+**************
+
+***CONCENTRATION INDEX - CORRECTED VERSION
+
+egen raw_rank=rank(wind), unique
+sort raw_rank
+quietly summ wgt
+gen wi=wgt/r(sum)
+gen cumsum=sum(wi)
+gen wj=cumsum[_n-1]
+replace wj=0 if wj==.
+gen rank=wj+0.5*wi
+drop raw_rank wi cumsum wj
+
+qui sum pod [aw=wgt]
+scalar mean=r(mean)
+cor pod rank [aw=wgt], covariance
+sca CI=8*r(cov_12)
+display "concentration index by convenient covariance method", CI
+
+***Computing the semi-elasticities, CI and contributions of each factor
+clear matrix
+#Creating dummy variable
+
+
+global X "mage1 mage2 mage3 numch1 numch2 wp1 wp2 wp3 birthord1 birthord2 birthord3 birthord4 lpb1 lpb2 lpb3 mcoh1 mcoh2 mcoh3 mcoh4 mcoh5 mcoh6 mcoh7 hhage1 hhage2 hhage3 hhage4 pelevel1 pelevel2 pelevel3 pelevel4 pelevel5 wind1 wind2 wind3 wind4 wind5 decision1 decision2 decision3 decision4"
+
+regress pod $X [pw=wgt], robust cluster(v001)
+
+*******decomposition starts here
+foreach x of global X {
+qui {
+scal b_`x'=_b[`x']
+corr rank `x' [aw=wgt], c
+sca cov_`x'=r(cov_12)
+sum `x' [aw=wgt]
+sca elas_`x'=(b_`x'*r(mean))
+sca CI_`x'=8*cov_`x'
+sca con_`x'=4*(elas_`x'*CI_`x')
+sca prcnt_`x'=(con_`x'/CI)*100
+
+
+}
+
+di "`x' elasticity:", elas_`x'
+di "`x' concentration index:", CI_`x'
+di "`x' contribution:", con_`x'
+di "`x' percentage contribution:", prcnt_`x'
+
+#matrix new = J(100,4,0)\(elas_`x', CI_`x', con_`x', prcnt_`x')
+matrix new = nullmat(new)\(elas_`x', CI_`x', con_`x', prcnt_`x')
+
+}
+matrix rownames new= $X
+matrix colnames new = "Elasticity""CI""Absolute""%"
+matrix list new, format(%8.4f)
+*********
+
+**************
+*assist
+**************
+
+***CONCENTRATION INDEX - CORRECTED VERSION
+
+egen raw_rank=rank(wind), unique
+sort raw_rank
+quietly summ wgt
+gen wi=wgt/r(sum)
+gen cumsum=sum(wi)
+gen wj=cumsum[_n-1]
+replace wj=0 if wj==.
+gen rank=wj+0.5*wi
+drop raw_rank wi cumsum wj
+
+qui sum assist [aw=wgt]
+scalar mean=r(mean)
+cor assist rank [aw=wgt], covariance
+sca CI=8*r(cov_12)
+display "concentration index by convenient covariance method", CI
+
+***Computing the semi-elasticities, CI and contributions of each factor
+clear matrix
+#Creating dummy variable
+
+
+global X "mage1 mage2 mage3 numch1 numch2 wp1 wp2 wp3 birthord1 birthord2 birthord3 birthord4 lpb1 lpb2 lpb3 mcoh1 mcoh2 mcoh3 mcoh4 mcoh5 mcoh6 mcoh7 hhage1 hhage2 hhage3 hhage4 pelevel1 pelevel2 pelevel3 pelevel4 pelevel5 wind1 wind2 wind3 wind4 wind5 decision1 decision2 decision3 decision4"
+
+regress assist $X [pw=wgt], robust cluster(v001)
+
+*******decomposition starts here
+foreach x of global X {
+qui {
+scal b_`x'=_b[`x']
+corr rank `x' [aw=wgt], c
+sca cov_`x'=r(cov_12)
+sum `x' [aw=wgt]
+sca elas_`x'=(b_`x'*r(mean))
+sca CI_`x'=8*cov_`x'
+sca con_`x'=4*(elas_`x'*CI_`x')
+sca prcnt_`x'=(con_`x'/CI)*100
+
+
+}
+
+di "`x' elasticity:", elas_`x'
+di "`x' concentration index:", CI_`x'
+di "`x' contribution:", con_`x'
+di "`x' percentage contribution:", prcnt_`x'
+
+#matrix new = J(100,4,0)\(elas_`x', CI_`x', con_`x', prcnt_`x')
+matrix new = nullmat(new)\(elas_`x', CI_`x', con_`x', prcnt_`x')
+
+}
+matrix rownames new= $X
+matrix colnames new = "Elasticity""CI""Absolute""%"
+matrix list new, format(%8.4f)
+*********
